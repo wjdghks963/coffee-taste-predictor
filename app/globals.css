@@ -1,26 +1,47 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8f6f3;
+  --foreground: #2c1810;
+
+  --coffee-dark: #2c1810;
+  --coffee-brown: #5c3d2e;
+  --coffee-medium: #8b6f47;
+  --coffee-light: #c9a882;
+  --cream: #f5e6d3;
+  --cream-light: #faf7f2;
+  --slate: #475569;
+  --slate-light: #cbd5e1;
+  --accent-gold: #d4a574;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-coffee-dark: var(--coffee-dark);
+  --color-coffee-brown: var(--coffee-brown);
+  --color-coffee-medium: var(--coffee-medium);
+  --color-coffee-light: var(--coffee-light);
+  --color-cream: var(--cream);
+  --color-cream-light: var(--cream-light);
+  --color-slate: var(--slate);
+  --color-slate-light: var(--slate-light);
+  --color-accent-gold: var(--accent-gold);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1a0f0a;
+    --foreground: #f5e6d3;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
