@@ -116,7 +116,7 @@ export default function InputForm({ onAnalyze }: InputFormProps) {
               value={beanName}
               onChange={(e) => setBeanName(e.target.value)}
               placeholder="e.g., Ethiopian Yirgacheffe"
-              className="w-full px-4 py-3 rounded-xl border-2 border-slate-light/50 focus:border-coffee-medium focus:outline-none transition-colors bg-white/50"
+              className="w-full px-4 py-3 rounded-xl border-2 border-slate-light/50 focus:border-coffee-medium focus:outline-none transition-colors bg-white/50 text-coffee-dark"
             />
           </motion.div>
 
@@ -174,7 +174,7 @@ export default function InputForm({ onAnalyze }: InputFormProps) {
               value={grinderModel}
               onChange={(e) => setGrinderModel(e.target.value)}
               placeholder="e.g., Comandante C40"
-              className="w-full px-4 py-3 rounded-xl border-2 border-slate-light/50 focus:border-coffee-medium focus:outline-none transition-colors bg-white/50"
+              className="w-full px-4 py-3 rounded-xl border-2 border-slate-light/50 focus:border-coffee-medium focus:outline-none transition-colors bg-white/50 text-coffee-dark"
             />
           </motion.div>
 
@@ -219,7 +219,7 @@ export default function InputForm({ onAnalyze }: InputFormProps) {
                   min="0"
                   max="9999"
                   placeholder="e.g., 20"
-                  className="w-full h-12 px-4 text-center text-2xl font-bold rounded-xl border-2 border-slate-light/50 focus:border-coffee-medium focus:outline-none transition-colors bg-white/50 cursor-text"
+                  className="w-full h-12 px-4 text-center text-2xl font-bold rounded-xl border-2 border-slate-light/50 focus:border-coffee-medium focus:outline-none transition-colors bg-white/50 text-coffee-dark cursor-text"
                 />
                 {grindSize > 0 && (
                   <motion.div
@@ -247,7 +247,7 @@ export default function InputForm({ onAnalyze }: InputFormProps) {
               <select
                 value={grindUnit}
                 onChange={(e) => setGrindUnit(e.target.value as 'clicks' | 'microns')}
-                className="px-4 h-12 rounded-xl border-2 border-slate-light/50 focus:border-coffee-medium focus:outline-none transition-colors bg-white/50 cursor-pointer font-semibold text-coffee-dark"
+                className="px-4 h-12 rounded-xl border-2 border-slate-light/50 focus:border-coffee-medium focus:outline-none transition-colors bg-white/50 cursor-pointer font-semibold text-coffee-dark [&>option]:text-coffee-dark"
               >
                 <option value="clicks">Clicks</option>
                 <option value="microns">Microns</option>
