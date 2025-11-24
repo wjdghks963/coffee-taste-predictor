@@ -1,8 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Award, Thermometer, Gauge, TrendingUp, RotateCcw } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Award, Thermometer, Gauge, TrendingUp, RotateCcw, Share2, Coffee } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { toPng } from 'html-to-image';
 import {
   Radar,
   RadarChart,
@@ -11,6 +12,7 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from 'recharts';
+import { CoffeeInputData } from './InputForm';
 
 export interface TasteProfile {
   acidity: number;
@@ -33,12 +35,77 @@ export interface AnalysisResult {
 
 interface ResultDisplayProps {
   result: AnalysisResult;
+  inputData: CoffeeInputData;
   onReset: () => void;
 }
 
-export default function ResultDisplay({ result, onReset }: ResultDisplayProps) {
+export default function ResultDisplay({ result, inputData, onReset }: ResultDisplayProps) {
   const [displayedComment, setDisplayedComment] = useState('');
   const [commentComplete, setCommentComplete] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
+  const captureRef = useRef<HTMLDivElement>(null);
+
+  const roastLabels = ['Light', 'Light-Medium', 'Medium', 'Medium-Dark', 'Dark'];
+
+  const handleShare = async () => {
+    if (!captureRef.current) return;
+
+    setIsCapturing(true);
+
+    try {
+      // Use html-to-image which handles modern CSS better
+      const dataUrl = await toPng(captureRef.current, {
+        backgroundColor: '#f8f6f3',
+        pixelRatio: 2,
+        cacheBust: true,
+      });
+
+      // Convert data URL to blob
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+
+      if (!blob) {
+        console.error('Failed to create blob');
+        setIsCapturing(false);
+        return;
+      }
+
+      // Try Web Share API first (mobile devices)
+      if (navigator.share) {
+        const file = new File([blob], 'coffee-analysis.png', { type: 'image/png' });
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'My Coffee Analysis',
+            text: `Check out my coffee taste analysis!`,
+          });
+        } catch (err) {
+          if ((err as Error).name !== 'AbortError') {
+            console.log('Share failed, falling back to download:', err);
+            // Fallback to download
+            downloadBlob(blob);
+          }
+        }
+      } else {
+        // Fallback: Download image
+        downloadBlob(blob);
+      }
+      setIsCapturing(false);
+    } catch (error) {
+      console.error('Error capturing image:', error);
+      alert('Failed to capture image. Please try again.');
+      setIsCapturing(false);
+    }
+  };
+
+  const downloadBlob = (blob: Blob) => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = 'coffee-analysis.png';
+    link.href = url;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   const chartData = [
     { attribute: 'Acidity', value: result.tasteProfile.acidity, fullMark: 100 },
@@ -82,7 +149,7 @@ export default function ResultDisplay({ result, onReset }: ResultDisplayProps) {
       transition={{ duration: 0.5 }}
       className="w-full max-w-4xl mx-auto"
     >
-      <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl border border-coffee-light/20 p-8 md:p-12">
+      <div ref={captureRef} data-capture-target className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-2xl border border-coffee-light/20 p-8 md:p-12">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -99,17 +166,69 @@ export default function ResultDisplay({ result, onReset }: ResultDisplayProps) {
               <p className="text-coffee-medium text-sm">AI-Generated Prediction</p>
             </div>
           </div>
-          <motion.div
-            className={`text-4xl font-bold ${getScoreColor(result.overallScore)}`}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
-          >
-            {result.overallScore}
-            <span className="text-sm text-coffee-medium block text-center">
-              {getScoreLabel(result.overallScore)}
-            </span>
-          </motion.div>
+          <div className="flex items-center gap-4">
+            <motion.button
+              onClick={handleShare}
+              disabled={isCapturing}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="p-3 rounded-xl bg-gradient-to-br from-accent-gold to-coffee-light text-white shadow-md hover:shadow-lg transition-all cursor-pointer disabled:opacity-50"
+            >
+              <Share2 className="w-5 h-5" />
+            </motion.button>
+            <motion.div
+              className={`text-4xl font-bold ${getScoreColor(result.overallScore)}`}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
+            >
+              {result.overallScore}
+              <span className="text-sm text-coffee-medium block text-center">
+                {getScoreLabel(result.overallScore)}
+              </span>
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Input Information */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-6 p-4 bg-gradient-to-r from-cream/30 to-cream/50 rounded-2xl border border-coffee-light/20"
+        >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <div className="flex items-center gap-1 mb-1">
+                <Coffee className="w-3 h-3 text-coffee-medium" />
+                <p className="text-xs text-coffee-medium font-semibold">Bean</p>
+              </div>
+              <p className="text-sm text-coffee-dark font-bold truncate">{inputData.beanName}</p>
+            </div>
+            <div>
+              <div className="flex items-center gap-1 mb-1">
+                <Gauge className="w-3 h-3 text-coffee-medium" />
+                <p className="text-xs text-coffee-medium font-semibold">Roast</p>
+              </div>
+              <p className="text-sm text-coffee-dark font-bold">{roastLabels[inputData.roastLevel]}</p>
+            </div>
+            <div>
+              <div className="flex items-center gap-1 mb-1">
+                <Gauge className="w-3 h-3 text-coffee-medium" />
+                <p className="text-xs text-coffee-medium font-semibold">Grinder</p>
+              </div>
+              <p className="text-sm text-coffee-dark font-bold truncate">{inputData.grinderModel}</p>
+            </div>
+            <div>
+              <div className="flex items-center gap-1 mb-1">
+                <Gauge className="w-3 h-3 text-coffee-medium" />
+                <p className="text-xs text-coffee-medium font-semibold">Grind Size</p>
+              </div>
+              <p className="text-sm text-coffee-dark font-bold">
+                {inputData.grindSize} {inputData.grindUnit}
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         {/* Radar Chart */}
@@ -119,14 +238,20 @@ export default function ResultDisplay({ result, onReset }: ResultDisplayProps) {
           transition={{ delay: 0.4 }}
           className="mb-8"
         >
-          <ResponsiveContainer width="100%" height={400}>
-            <RadarChart data={chartData}>
+          <ResponsiveContainer width="100%" height={450}>
+            <RadarChart data={chartData} margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>
               <PolarGrid stroke="#c9a882" strokeWidth={1.5} />
               <PolarAngleAxis
                 dataKey="attribute"
                 tick={{ fill: '#2c1810', fontSize: 14, fontWeight: 600 }}
+                tickLine={false}
               />
-              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: '#8b6f47' }} />
+              <PolarRadiusAxis
+                angle={90}
+                domain={[0, 100]}
+                tick={{ fill: '#8b6f47' }}
+                axisLine={false}
+              />
               <Radar
                 name="Taste Profile"
                 dataKey="value"

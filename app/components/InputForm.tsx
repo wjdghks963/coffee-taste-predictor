@@ -18,19 +18,57 @@ export interface CoffeeInputData {
 
 const roastLabels = ['Light', 'Light-Medium', 'Medium', 'Medium-Dark', 'Dark'];
 
+// Validation helper functions
+const isValidInput = (input: string): boolean => {
+  // Remove whitespace
+  const trimmed = input.trim();
+
+  // Check minimum length
+  if (trimmed.length < 2) return false;
+
+  // Check for only Korean consonants (ㄱ-ㅎ, ㅏ-ㅣ)
+  const onlyKoreanJamo = /^[ㄱ-ㅎㅏ-ㅣ\s]+$/.test(trimmed);
+  if (onlyKoreanJamo) return false;
+
+  // Check for only numbers
+  const onlyNumbers = /^\d+$/.test(trimmed);
+  if (onlyNumbers) return false;
+
+  // Check for only special characters
+  const onlySpecialChars = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/.test(trimmed);
+  if (onlySpecialChars) return false;
+
+  return true;
+};
+
 export default function InputForm({ onAnalyze }: InputFormProps) {
   const [beanName, setBeanName] = useState('');
   const [roastLevel, setRoastLevel] = useState(2);
   const [grinderModel, setGrinderModel] = useState('');
   const [grindSize, setGrindSize] = useState(0);
   const [grindUnit, setGrindUnit] = useState<'clicks' | 'microns'>('clicks');
+  const [validationError, setValidationError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate bean name
+    if (!isValidInput(beanName)) {
+      setValidationError('Please enter a valid coffee bean name (e.g., Ethiopian Yirgacheffe, 예가체프)');
+      return;
+    }
+
+    // Validate grinder model
+    if (!isValidInput(grinderModel)) {
+      setValidationError('Please enter a valid grinder model name (e.g., Comandante C40, 커맨단테)');
+      return;
+    }
+
+    setValidationError('');
     onAnalyze({
-      beanName,
+      beanName: beanName.trim(),
       roastLevel,
-      grinderModel,
+      grinderModel: grinderModel.trim(),
       grindSize,
       grindUnit,
     });
@@ -174,9 +212,14 @@ export default function InputForm({ onAnalyze }: InputFormProps) {
                 <input
                   type="number"
                   value={grindSize || ''}
-                  onChange={(e) => setGrindSize(Number(e.target.value))}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    setGrindSize(Math.min(9999, Math.max(0, value)));
+                  }}
+                  min="0"
+                  max="9999"
                   placeholder="e.g., 20"
-                  className="w-full h-12 px-4 text-center text-2xl font-bold rounded-xl border-2 border-slate-light/50 focus:border-coffee-medium focus:outline-none transition-colors bg-white/50"
+                  className="w-full h-12 px-4 text-center text-2xl font-bold rounded-xl border-2 border-slate-light/50 focus:border-coffee-medium focus:outline-none transition-colors bg-white/50 cursor-text"
                 />
                 {grindSize > 0 && (
                   <motion.div
@@ -192,7 +235,7 @@ export default function InputForm({ onAnalyze }: InputFormProps) {
               {/* Increase Button */}
               <motion.button
                 type="button"
-                onClick={() => setGrindSize(grindSize + 1)}
+                onClick={() => setGrindSize(Math.min(9999, grindSize + 1))}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-coffee-medium to-coffee-dark text-white shadow-md hover:shadow-lg transition-all cursor-pointer"
@@ -231,6 +274,17 @@ export default function InputForm({ onAnalyze }: InputFormProps) {
               </motion.div>
             )}
           </motion.div>
+
+          {/* Validation Error Message */}
+          {validationError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-4 bg-red-100 border border-red-300 rounded-xl text-red-700 text-sm"
+            >
+              {validationError}
+            </motion.div>
+          )}
 
           {/* Submit Button */}
           <motion.button

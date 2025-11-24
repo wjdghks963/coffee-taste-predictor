@@ -18,7 +18,7 @@ export default function LoadingAnimation() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentStep((prev) => (prev + 1) % loadingSteps.length);
-    }, 600);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, []);
@@ -154,7 +154,7 @@ export default function LoadingAnimation() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.5 }}
                 className="flex items-center gap-2"
               >
                 <motion.div

@@ -11,9 +11,12 @@ type AppState = 'input' | 'loading' | 'result' | 'error';
 export default function Home() {
   const [appState, setAppState] = useState<AppState>('input');
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [inputData, setInputData] = useState<CoffeeInputData | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const handleAnalyze = async (inputData: CoffeeInputData) => {
+  const handleAnalyze = async (data: CoffeeInputData) => {
+    setInputData(data);
+    const inputData = data;
     setAppState('loading');
     setErrorMessage('');
 
@@ -72,8 +75,8 @@ export default function Home() {
             </div>
           </div>
         )}
-        {appState === 'result' && analysisResult && (
-          <ResultDisplay key="result" result={analysisResult} onReset={handleReset} />
+        {appState === 'result' && analysisResult && inputData && (
+          <ResultDisplay key="result" result={analysisResult} inputData={inputData} onReset={handleReset} />
         )}
       </AnimatePresence>
     </div>

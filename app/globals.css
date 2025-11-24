@@ -45,3 +45,45 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Custom Range Slider Styling for Roast Level */
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b6f47, #5c3d2e);
+  cursor: pointer;
+  border: 3px solid #f5e6d3;
+  box-shadow: 0 2px 8px rgba(92, 61, 46, 0.3);
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(92, 61, 46, 0.4);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.05);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b6f47, #5c3d2e);
+  cursor: pointer;
+  border: 3px solid #f5e6d3;
+  box-shadow: 0 2px 8px rgba(92, 61, 46, 0.3);
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(92, 61, 46, 0.4);
+}
+
+input[type="range"]::-moz-range-thumb:active {
+  transform: scale(1.05);
+}
